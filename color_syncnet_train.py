@@ -18,10 +18,10 @@ from hparams import hparams, get_image_list
 
 parser = argparse.ArgumentParser(description='Code to train the expert lip-sync discriminator')
 
-parser.add_argument("--data_root", help="Root folder of the preprocessed LRS2 dataset", required=True)
+parser.add_argument("--data_root", help="Root folder of the preprocessed LRS2 dataset", default='zhubo_preprocessed/')
 
-parser.add_argument('--checkpoint_dir', help='Save checkpoints to this directory', required=True, type=str)
-parser.add_argument('--checkpoint_path', help='Resumed from this checkpoint', default=None, type=str)
+parser.add_argument('--checkpoint_dir', help='Save checkpoints to this directory', default='checkpoints', type=str)
+parser.add_argument('--checkpoint_path', help='Resumed from this checkpoint', default='checkpoints/lipsync_expert.pth', type=str)
 
 args = parser.parse_args()
 
@@ -113,6 +113,7 @@ class Dataset(object):
 
                 orig_mel = audio.melspectrogram(wav).T
             except Exception as e:
+                print("\n"+str(e)+":"+wavpath+"\n")
                 continue
 
             mel = self.crop_audio_window(orig_mel.copy(), img_name)
@@ -179,7 +180,7 @@ def train(device, model, train_data_loader, test_data_loader, optimizer,
         global_epoch += 1
 
 def eval_model(test_data_loader, global_step, device, model, checkpoint_dir):
-    eval_steps = 1400
+    eval_steps = 20 #
     print('Evaluating for {} steps'.format(eval_steps))
     losses = []
     while 1:
@@ -201,14 +202,14 @@ def eval_model(test_data_loader, global_step, device, model, checkpoint_dir):
             if step > eval_steps: break
 
         averaged_loss = sum(losses) / len(losses)
-        print(averaged_loss)
+        print("Eval AvgLoss:",averaged_loss)
 
         return
 
 def save_checkpoint(model, optimizer, step, checkpoint_dir, epoch):
 
     checkpoint_path = join(
-        checkpoint_dir, "checkpoint_step{:09d}.pth".format(global_step))
+        checkpoint_dir, "syncnet_step{:09d}.pth".format(global_step))
     optimizer_state = optimizer.state_dict() if hparams.save_optimizer_state else None
     torch.save({
         "state_dict": model.state_dict(),
@@ -259,7 +260,7 @@ if __name__ == "__main__":
 
     test_data_loader = data_utils.DataLoader(
         test_dataset, batch_size=hparams.syncnet_batch_size,
-        num_workers=8)
+        num_workers=2)
 
     device = torch.device("cuda" if use_cuda else "cpu")
 

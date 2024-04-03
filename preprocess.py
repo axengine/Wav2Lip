@@ -22,10 +22,10 @@ import face_detection
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('--ngpu', help='Number of GPUs across which to run in parallel', default=1, type=int)
-parser.add_argument('--batch_size', help='Single GPU Face detection batch size', default=32, type=int)
-parser.add_argument("--data_root", help="Root folder of the LRS2 dataset", required=True)
-parser.add_argument("--preprocessed_root", help="Root folder of the preprocessed dataset", required=True)
+parser.add_argument('--ngpu', help='Number of GPUs across which to run in parallel', default=2, type=int)
+parser.add_argument('--batch_size', help='Single GPU Face detection batch size', default=4, type=int)
+parser.add_argument("--data_root", help="Root folder of the LRS2 dataset", default='data_root/zhubo',required=False)
+parser.add_argument("--preprocessed_root", help="Root folder of the preprocessed dataset", default='zhubo_preprocessed',required=False)
 
 args = parser.parse_args()
 

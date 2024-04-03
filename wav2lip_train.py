@@ -19,12 +19,12 @@ from hparams import hparams, get_image_list
 
 parser = argparse.ArgumentParser(description='Code to train the Wav2Lip model without the visual quality discriminator')
 
-parser.add_argument("--data_root", help="Root folder of the preprocessed LRS2 dataset", required=True, type=str)
+parser.add_argument("--data_root", help="Root folder of the preprocessed LRS2 dataset", default='cctv_preprocessed/', type=str)
 
-parser.add_argument('--checkpoint_dir', help='Save checkpoints to this directory', required=True, type=str)
-parser.add_argument('--syncnet_checkpoint_path', help='Load the pre-trained Expert discriminator', required=True, type=str)
+parser.add_argument('--checkpoint_dir', help='Save checkpoints to this directory', default='checkpoints', type=str)
+parser.add_argument('--syncnet_checkpoint_path', help='Load the pre-trained Expert discriminator', default='checkpoints/syncnet_step001760000.pth', type=str)
 
-parser.add_argument('--checkpoint_path', help='Resume from this checkpoint', default=None, type=str)
+parser.add_argument('--checkpoint_path', help='Resume from this checkpoint', default='checkpoints/wav2lip.pth', type=str)
 
 args = parser.parse_args()
 
@@ -260,7 +260,7 @@ def train(device, model, train_data_loader, test_data_loader, optimizer,
         
 
 def eval_model(test_data_loader, global_step, device, model, checkpoint_dir):
-    eval_steps = 700
+    eval_steps = 20
     print('Evaluating for {} steps'.format(eval_steps))
     sync_losses, recon_losses = [], []
     step = 0
@@ -287,7 +287,7 @@ def eval_model(test_data_loader, global_step, device, model, checkpoint_dir):
                 averaged_sync_loss = sum(sync_losses) / len(sync_losses)
                 averaged_recon_loss = sum(recon_losses) / len(recon_losses)
 
-                print('L1: {}, Sync loss: {}'.format(averaged_recon_loss, averaged_sync_loss))
+                print('Eval L1: {}, Sync loss: {}'.format(averaged_recon_loss, averaged_sync_loss))
 
                 return averaged_sync_loss
 

@@ -20,13 +20,13 @@ from hparams import hparams, get_image_list
 
 parser = argparse.ArgumentParser(description='Code to train the Wav2Lip model WITH the visual quality discriminator')
 
-parser.add_argument("--data_root", help="Root folder of the preprocessed LRS2 dataset", required=True, type=str)
+parser.add_argument("--data_root", help="Root folder of the preprocessed LRS2 dataset", default='cmlr_preprocessed/', type=str)
 
-parser.add_argument('--checkpoint_dir', help='Save checkpoints to this directory', required=True, type=str)
-parser.add_argument('--syncnet_checkpoint_path', help='Load the pre-trained Expert discriminator', required=True, type=str)
+parser.add_argument('--checkpoint_dir', help='Save checkpoints to this directory', default='checkpoints', type=str)
+parser.add_argument('--syncnet_checkpoint_path', help='Load the pre-trained Expert discriminator', default='checkpoints/syncnet_step001780000.pth', type=str)
 
-parser.add_argument('--checkpoint_path', help='Resume generator from this checkpoint', default=None, type=str)
-parser.add_argument('--disc_checkpoint_path', help='Resume quality disc from this checkpoint', default=None, type=str)
+parser.add_argument('--checkpoint_path', help='Resume generator from this checkpoint', default='checkpoints/wav2lip_gan.pth', type=str)
+parser.add_argument('--disc_checkpoint_path', help='Resume quality disc from this checkpoint', default='checkpoints/visual_quality_disc.pth', type=str)
 
 args = parser.parse_args()
 
@@ -343,7 +343,7 @@ def eval_model(test_data_loader, global_step, device, model, disc):
 
             if step > eval_steps: break
 
-        print('L1: {}, Sync: {}, Percep: {} | Fake: {}, Real: {}'.format(sum(running_l1_loss) / len(running_l1_loss),
+        print('Eval L1: {}, Sync: {}, Percep: {} | Fake: {}, Real: {}'.format(sum(running_l1_loss) / len(running_l1_loss),
                                                             sum(running_sync_loss) / len(running_sync_loss),
                                                             sum(running_perceptual_loss) / len(running_perceptual_loss),
                                                             sum(running_disc_fake_loss) / len(running_disc_fake_loss),
